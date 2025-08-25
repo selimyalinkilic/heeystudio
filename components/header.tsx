@@ -11,7 +11,7 @@ export default function Header() {
               <li>
                 <a
                   href="#"
-                  className="text-white text-sm lg:text-lg hover:text-underline"
+                  className="text-white text-sm lg:text-lg hover:underline"
                 >
                   Home
                 </a>
@@ -19,7 +19,7 @@ export default function Header() {
               <li>
                 <a
                   href="#"
-                  className="text-white text-sm lg:text-lg hover:text-underline"
+                  className="text-white text-sm lg:text-lg hover:underline"
                 >
                   Portfolio
                 </a>
@@ -27,7 +27,7 @@ export default function Header() {
               <li>
                 <a
                   href="#"
-                  className="text-white text-sm lg:text-lg hover:text-underline"
+                  className="text-white text-sm lg:text-lg hover:underline"
                 >
                   Contact
                 </a>

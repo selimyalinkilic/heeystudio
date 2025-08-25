@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 export default function Hero() {
   return (
-    <div className="w-full aspect-square lg:h-screen overflow-hidden relative">
+    <div className="w-full aspect-square lg:h-screen overflow-hidden relative after:content-[''] after:w-full after:h-12 after:lg:h-24 after:absolute after:bottom-0 after:left-0 after:from-black/0 after:to-black after:bg-gradient-to-b after:z-10">
       <Swiper
         spaceBetween={0}
         slidesPerView={1}
