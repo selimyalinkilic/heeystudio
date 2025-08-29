@@ -61,10 +61,6 @@ The `lib/storage.ts` file provides helper functions for:
 
 - `getImageUrl(path)` - Converts storage path to public URL
 - `getVideoUrl(path)` - Converts video path to public URL
-- `uploadImage(file, filename)` - Uploads image to images/ folder
-- `uploadVideo(file, filename)` - Uploads video to videos/ folder
-- `deleteImage(path)` - Deletes image from storage
-- `deleteVideo(path)` - Deletes video from storage
 
 ## Features
 

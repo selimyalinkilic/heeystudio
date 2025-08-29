@@ -22,7 +22,7 @@ export default function Hero() {
         const urls: { [key: string]: string } = {};
         for (const portfolio of data) {
           if (!portfolio.image_path_original.startsWith('/')) {
-            urls[portfolio.image_path_original] = await getImageUrl(
+            urls[portfolio.image_path_original] = getImageUrl(
               portfolio.image_path_original
             );
           }
@@ -92,17 +92,6 @@ export default function Hero() {
               fill
               priority={index === 0}
             />
-            {/* Portfolio title overlay */}
-            <div className="absolute bottom-20 left-8 z-20 text-white">
-              <h2 className="text-2xl lg:text-4xl font-bold mb-2">
-                {item.title}
-              </h2>
-              {item.description && (
-                <p className="text-lg lg:text-xl opacity-90 max-w-2xl">
-                  {item.description}
-                </p>
-              )}
-            </div>
           </SwiperSlide>
         ))}
       </Swiper>

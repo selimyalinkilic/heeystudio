@@ -29,19 +29,19 @@ export default function Masonry() {
         for (const portfolio of data) {
           // Thumbnail image URL
           if (!portfolio.image_path_min.startsWith('/')) {
-            imgUrls[`${portfolio.id}_min`] = await getImageUrl(
+            imgUrls[`${portfolio.id}_min`] = getImageUrl(
               portfolio.image_path_min
             );
           }
           // Original image URL
           if (!portfolio.image_path_original.startsWith('/')) {
-            imgUrls[`${portfolio.id}_original`] = await getImageUrl(
+            imgUrls[`${portfolio.id}_original`] = getImageUrl(
               portfolio.image_path_original
             );
           }
           // Video URL
           if (portfolio.video_path && !portfolio.video_path.startsWith('/')) {
-            vidUrls[portfolio.id] = await getVideoUrl(portfolio.video_path);
+            vidUrls[portfolio.id] = getVideoUrl(portfolio.video_path);
           }
         }
 
@@ -77,12 +77,12 @@ export default function Masonry() {
           Portfolio
         </h2>
       </div>
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 py-14 lg:py-20">
+      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 py-14 lg:py-20 px-4 lg:px-8">
         {portfolios.length > 0 ? (
           portfolios.map((portfolio) => (
             <div
               key={portfolio.id}
-              className="mb-4 break-inside-avoid overflow-hidden rounded-lg"
+              className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <a
                 type="button"
@@ -90,20 +90,20 @@ export default function Masonry() {
                 onClick={() => handlePortfolioClick(portfolio)}
               >
                 <Image
-                  className="hover:scale-105 transition-transform duration-300"
-                  src={getImageUrl(portfolio.image_path_min)} // Küçük resim kullan
+                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
+                  src={imageUrls[`${portfolio.id}_min`] || '/photo1.jpeg'} // Cached URL kullan
                   alt={portfolio.title}
-                  layout="responsive"
                   width={500}
                   height={300}
+                  style={{ objectFit: 'cover' }}
                 />
                 {/* Portfolio info overlay */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity duration-300">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <h3 className="text-white font-semibold text-lg mb-1">
                     {portfolio.title}
                   </h3>
                   {portfolio.description && (
-                    <p className="text-white/80 text-sm">
+                    <p className="text-white/80 text-sm line-clamp-2">
                       {portfolio.description}
                     </p>
                   )}
@@ -114,7 +114,7 @@ export default function Masonry() {
         ) : (
           // Fallback images if no portfolios
           <>
-            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg">
+            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
               <a
                 type="button"
                 className="hover:cursor-pointer"
@@ -133,16 +133,16 @@ export default function Masonry() {
                 }
               >
                 <Image
-                  className="hover:scale-105 transition-transform duration-300"
+                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
                   src="/photo1.jpeg"
                   alt="Sample Portfolio"
-                  layout="responsive"
                   width={500}
                   height={300}
+                  style={{ objectFit: 'cover' }}
                 />
               </a>
             </div>
-            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg">
+            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
               <a
                 type="button"
                 className="hover:cursor-pointer"
@@ -161,12 +161,12 @@ export default function Masonry() {
                 }
               >
                 <Image
-                  className="hover:scale-105 transition-transform duration-300"
+                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
                   src="/photo2.jpeg"
                   alt="Sample Portfolio"
-                  layout="responsive"
                   width={500}
                   height={300}
+                  style={{ objectFit: 'cover' }}
                 />
               </a>
             </div>
@@ -186,29 +186,46 @@ export default function Masonry() {
                 src={
                   selectedPortfolio.video_path.startsWith('/')
                     ? selectedPortfolio.video_path
-                    : getVideoUrl(selectedPortfolio.video_path)
+                    : videoUrls[selectedPortfolio.id] || ''
                 }
                 controls
                 className="w-full rounded-lg"
                 poster={
                   selectedPortfolio.image_path_original.startsWith('/')
                     ? selectedPortfolio.image_path_original
-                    : getImageUrl(selectedPortfolio.image_path_original)
+                    : imageUrls[`${selectedPortfolio.id}_original`] ||
+                      '/photo1.jpeg'
                 }
               />
             ) : (
-              <Image
-                src={
-                  selectedPortfolio.image_path_original.startsWith('/')
-                    ? selectedPortfolio.image_path_original
-                    : getImageUrl(selectedPortfolio.image_path_original)
-                }
-                alt={selectedPortfolio.title}
-                layout="responsive"
-                width={500}
-                height={300}
-                className="rounded-lg"
-              />
+              <div className="relative group cursor-zoom-in">
+                <Image
+                  src={
+                    selectedPortfolio.image_path_original.startsWith('/')
+                      ? selectedPortfolio.image_path_original
+                      : imageUrls[`${selectedPortfolio.id}_original`] ||
+                        '/photo1.jpeg'
+                  }
+                  alt={selectedPortfolio.title}
+                  width={800}
+                  height={500}
+                  className="rounded-lg w-full h-auto transition-transform duration-300 hover:scale-105"
+                  style={{ objectFit: 'contain' }}
+                  onClick={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    if (img.style.transform === 'scale(2)') {
+                      img.style.transform = 'scale(1)';
+                      img.style.cursor = 'zoom-in';
+                    } else {
+                      img.style.transform = 'scale(2)';
+                      img.style.cursor = 'zoom-out';
+                    }
+                  }}
+                />
+                <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  Click to zoom
+                </div>
+              </div>
             )}
             <div>
               <h3 className="text-xl font-semibold mb-2">

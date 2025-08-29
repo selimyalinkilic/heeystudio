@@ -72,7 +72,7 @@ export function Modal({
       onClick={handleBackdropClick}
       style={{ display: 'none' }}
     >
-      <div className="modal-dialog" role="document">
+      <div className="modal-dialog modal-lg" role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h2 id="modalTitle" className="modal-title">
@@ -87,7 +87,9 @@ export function Modal({
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div className="modal-body">{children}</div>
+          <div className="modal-body overflow-auto max-h-[70vh]">
+            {children}
+          </div>
           <div className="modal-footer">
             <button
               type="button"
