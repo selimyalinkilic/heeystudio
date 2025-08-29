@@ -29,7 +29,7 @@ export async function getAllPortfolios(): Promise<Portfolio[]> {
       .from('portfolios')
       .select('*')
       .eq('visibility', true) // Sadece görünür olanlar
-      .order('created_at', { ascending: false });
+      .order('sort_order', { ascending: true }); // sort_order'a göre sırala (küçükten büyüğe)
 
     if (error) {
       console.error('Error fetching all portfolios:', error);

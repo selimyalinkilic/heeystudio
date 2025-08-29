@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Modal } from './modal';
 import Loading from './loading';
+import ModalLoading from './modal-loading';
 import { useModal } from '@/hooks/useModal';
 import { useState, useEffect } from 'react';
 import { getAllPortfolios } from '@/lib/api';
@@ -19,6 +20,7 @@ export default function Masonry() {
   const [imageLoaded, setImageLoaded] = useState<{ [key: string]: boolean }>(
     {}
   );
+  const [modalImageLoading, setModalImageLoading] = useState(false);
 
   useEffect(() => {
     async function fetchPortfolios() {
@@ -62,6 +64,7 @@ export default function Masonry() {
   }, []);
 
   const handlePortfolioClick = (portfolio: Portfolio) => {
+    setModalImageLoading(true);
     setSelectedPortfolio(portfolio);
     openModal();
   };
@@ -112,6 +115,21 @@ export default function Masonry() {
                     }));
                   }}
                 />
+
+                {/* Video Play Icon - sadece video varsa göster */}
+                {portfolio.video_path && (
+                  <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-sm text-white p-2 rounded-full shadow-lg">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                )}
+
                 {/* Portfolio info overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <h3 className="text-white font-semibold text-lg mb-1">
@@ -142,6 +160,7 @@ export default function Masonry() {
                     image_path_min: '/photo1.jpeg', // Küçük (aynı olsun fallback için)
                     video_path: undefined,
                     visibility: true,
+                    sort_order: 1,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                   })
@@ -170,6 +189,7 @@ export default function Masonry() {
                     image_path_min: '/photo2.jpeg', // Küçük (aynı olsun fallback için)
                     video_path: undefined,
                     visibility: true,
+                    sort_order: 2,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                   })
@@ -193,26 +213,47 @@ export default function Masonry() {
           <div className="w-full max-w-none">
             {/* Video varsa video göster, yoksa resim göster */}
             {selectedPortfolio.video_path ? (
-              <video
-                src={
-                  selectedPortfolio.video_path.startsWith('/')
-                    ? selectedPortfolio.video_path
-                    : videoUrls[selectedPortfolio.id] || ''
-                }
-                controls
-                className="w-full max-w-4xl rounded-lg mx-auto block"
-                poster={
-                  selectedPortfolio.image_path_original.startsWith('/')
-                    ? selectedPortfolio.image_path_original
-                    : imageUrls[`${selectedPortfolio.id}_original`] ||
-                      '/photo1.jpeg'
-                }
-              />
+              <div className="relative">
+                {/* Video Loading */}
+                {modalImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white rounded-lg z-10">
+                    <ModalLoading />
+                  </div>
+                )}
+
+                <video
+                  src={
+                    selectedPortfolio.video_path.startsWith('/')
+                      ? selectedPortfolio.video_path
+                      : videoUrls[selectedPortfolio.id] || ''
+                  }
+                  controls
+                  className={`w-full max-w-4xl rounded-lg mx-auto block transition-opacity duration-300 ${
+                    modalImageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
+                  poster={
+                    selectedPortfolio.image_path_original.startsWith('/')
+                      ? selectedPortfolio.image_path_original
+                      : imageUrls[`${selectedPortfolio.id}_original`] ||
+                        '/photo1.jpeg'
+                  }
+                  onLoadedData={() => {
+                    setModalImageLoading(false);
+                  }}
+                />
+              </div>
             ) : (
               <div
                 className="zoom-container relative"
                 id="image-zoom-container"
               >
+                {/* Modal Image Loading */}
+                {modalImageLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white rounded-lg z-10">
+                    <ModalLoading />
+                  </div>
+                )}
+
                 <Image
                   src={
                     selectedPortfolio.image_path_original.startsWith('/')
@@ -224,9 +265,14 @@ export default function Masonry() {
                   width={0}
                   height={0}
                   sizes="100vw"
-                  className="zoom-image rounded-lg max-w-full max-h-[60vh] w-auto h-auto"
+                  className={`zoom-image rounded-lg max-w-full max-h-[60vh] w-auto h-auto transition-opacity duration-300 ${
+                    modalImageLoading ? 'opacity-0' : 'opacity-100'
+                  }`}
                   style={{
                     objectFit: 'contain',
+                  }}
+                  onLoad={() => {
+                    setModalImageLoading(false);
                   }}
                   onMouseEnter={(e) => {
                     // Desktop hover zoom

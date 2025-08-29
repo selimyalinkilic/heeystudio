@@ -15,7 +15,7 @@ export default function Header() {
     <header className="absolute top-0 left-0 right-0 z-50">
       <div className="container mx-auto">
         <div className="flex items-center justify-between py-6 md:py-8 lg:py-10">
-          <h1 
+          <h1
             className="text-xl lg:text-3xl font-bold text-white cursor-pointer"
             onClick={() => scrollToSection('home')}
           >

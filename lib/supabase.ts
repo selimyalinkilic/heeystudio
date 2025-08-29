@@ -14,6 +14,7 @@ export interface Portfolio {
   image_path_min: string; // Küçük thumbnail resim dosya path'i (images/ klasöründe)
   video_path?: string; // Video dosya path'i (videos/ klasöründe, opsiyonel)
   visibility: boolean; // Görünürlük (public/private)
+  sort_order: number; // Sıralama düzeni (düşük numara önce gelir)
   created_at: string;
   updated_at: string;
 }
