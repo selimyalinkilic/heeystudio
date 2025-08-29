@@ -61,6 +61,12 @@ body {
   width: 90vw;
 }
 
+.modal-dialog.modal-xl {
+  max-width: 95vw;
+  width: 95vw;
+  margin: 0.25rem auto;
+}
+
 .modal.show .modal-dialog {
   transform: translate(0, 0);
 }
@@ -145,4 +151,28 @@ body {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Image zoom styles */
+.zoom-container {
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+
+.zoom-container.zoomed {
+  overflow: auto;
+  max-height: 80vh;
+}
+
+.zoom-image {
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+
+.zoom-image:hover {
+  cursor: zoom-in;
+}
+
+.zoom-image.zoomed {
+  cursor: zoom-out;
 }

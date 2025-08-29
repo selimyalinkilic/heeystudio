@@ -198,31 +198,42 @@ export default function Masonry() {
                 }
               />
             ) : (
-              <div className="relative group cursor-zoom-in">
-                <Image
-                  src={
-                    selectedPortfolio.image_path_original.startsWith('/')
-                      ? selectedPortfolio.image_path_original
-                      : imageUrls[`${selectedPortfolio.id}_original`] ||
-                        '/photo1.jpeg'
-                  }
-                  alt={selectedPortfolio.title}
-                  width={800}
-                  height={500}
-                  className="rounded-lg w-full h-auto transition-transform duration-300 hover:scale-105"
-                  style={{ objectFit: 'contain' }}
-                  onClick={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    if (img.style.transform === 'scale(2)') {
-                      img.style.transform = 'scale(1)';
-                      img.style.cursor = 'zoom-in';
-                    } else {
-                      img.style.transform = 'scale(2)';
-                      img.style.cursor = 'zoom-out';
+              <div className="zoom-container" id="image-zoom-container">
+                <div className="flex justify-center">
+                  <Image
+                    src={
+                      selectedPortfolio.image_path_original.startsWith('/')
+                        ? selectedPortfolio.image_path_original
+                        : imageUrls[`${selectedPortfolio.id}_original`] ||
+                          '/photo1.jpeg'
                     }
-                  }}
-                />
-                <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                    alt={selectedPortfolio.title}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="zoom-image rounded-lg max-w-full max-h-[60vh] w-auto h-auto"
+                    style={{
+                      objectFit: 'contain',
+                    }}
+                    onClick={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      const container = document.getElementById(
+                        'image-zoom-container'
+                      );
+
+                      if (img.classList.contains('zoomed')) {
+                        img.style.transform = 'scale(1)';
+                        img.classList.remove('zoomed');
+                        container?.classList.remove('zoomed');
+                      } else {
+                        img.style.transform = 'scale(2)';
+                        img.classList.add('zoomed');
+                        container?.classList.add('zoomed');
+                      }
+                    }}
+                  />
+                </div>
+                <div className="absolute top-2 right-2 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium">
                   Click to zoom
                 </div>
               </div>

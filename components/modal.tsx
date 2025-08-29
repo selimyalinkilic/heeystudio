@@ -13,6 +13,17 @@ export function Modal({
   onClose: () => void;
 }) {
   const modalRef = React.useRef<HTMLDivElement>(null);
+  const [modalSize, setModalSize] = React.useState<'modal-lg' | 'modal-xl'>(
+    'modal-xl'
+  );
+
+  // Function to determine modal size based on content
+  React.useEffect(() => {
+    if (isOpen) {
+      // Always use extra large modal for better image viewing
+      setModalSize('modal-xl');
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     const modal = modalRef.current;
@@ -72,7 +83,7 @@ export function Modal({
       onClick={handleBackdropClick}
       style={{ display: 'none' }}
     >
-      <div className="modal-dialog modal-lg" role="document">
+      <div className={`modal-dialog ${modalSize}`} role="document">
         <div className="modal-content">
           <div className="modal-header">
             <h2 id="modalTitle" className="modal-title">
@@ -87,7 +98,7 @@ export function Modal({
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div className="modal-body overflow-auto max-h-[70vh]">
+          <div className="modal-body overflow-hidden max-h-[80vh]">
             {children}
           </div>
           <div className="modal-footer">
