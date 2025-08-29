@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Modal } from './modal';
+import Loading from './loading';
 import { useModal } from '@/hooks/useModal';
 import { useState, useEffect } from 'react';
 import { getAllPortfolios } from '@/lib/api';
@@ -15,6 +16,9 @@ export default function Masonry() {
   const [loading, setLoading] = useState(true);
   const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
   const [videoUrls, setVideoUrls] = useState<{ [key: string]: string }>({});
+  const [imageLoaded, setImageLoaded] = useState<{ [key: string]: boolean }>(
+    {}
+  );
 
   useEffect(() => {
     async function fetchPortfolios() {
@@ -63,11 +67,7 @@ export default function Masonry() {
   };
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-20">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
@@ -89,13 +89,28 @@ export default function Masonry() {
                 className="hover:cursor-pointer block"
                 onClick={() => handlePortfolioClick(portfolio)}
               >
+                {/* Image skeleton */}
+                {!imageLoaded[`${portfolio.id}_min`] && (
+                  <div className="w-full h-64 image-skeleton rounded-lg"></div>
+                )}
+
                 <Image
-                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
+                  className={`hover:scale-105 transition-transform duration-300 w-full h-auto ${
+                    imageLoaded[`${portfolio.id}_min`]
+                      ? 'image-loaded'
+                      : 'image-loading'
+                  }`}
                   src={imageUrls[`${portfolio.id}_min`] || '/photo1.jpeg'} // Cached URL kullan
                   alt={portfolio.title}
                   width={500}
                   height={300}
                   style={{ objectFit: 'cover' }}
+                  onLoad={() => {
+                    setImageLoaded((prev) => ({
+                      ...prev,
+                      [`${portfolio.id}_min`]: true,
+                    }));
+                  }}
                 />
                 {/* Portfolio info overlay */}
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

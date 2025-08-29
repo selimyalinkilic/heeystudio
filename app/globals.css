@@ -219,3 +219,61 @@ body {
     cursor: pointer;
   }
 }
+
+/* Modern loading animations */
+@keyframes pulse-dot {
+  0%,
+  20% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  80%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.pulse-dot-1 {
+  animation: pulse-dot 1.4s infinite;
+  animation-delay: 0s;
+}
+
+.pulse-dot-2 {
+  animation: pulse-dot 1.4s infinite;
+  animation-delay: 0.2s;
+}
+
+.pulse-dot-3 {
+  animation: pulse-dot 1.4s infinite;
+  animation-delay: 0.4s;
+}
+
+/* Image loading skeleton */
+.image-skeleton {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 2s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.image-loading {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.image-loaded {
+  opacity: 1;
+}
