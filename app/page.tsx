@@ -5,10 +5,10 @@ import Masonry from '@/components/masonry';
 export default function Home() {
   return (
     <>
-      <section>
+      <section id="home">
         <Hero />
       </section>
-      <section className="bg-black relative">
+      <section id="portfolio" className="bg-black relative">
         <div className="container mx-auto">
           <Masonry />
         </div>
