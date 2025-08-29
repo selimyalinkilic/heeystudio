@@ -21,7 +21,10 @@ export function Modal({
     if (isOpen) {
       modal.style.display = 'block';
       // Trigger reflow to ensure display:block is applied before adding show class
-      modal.classList.add('show');
+      void modal.offsetHeight;
+      setTimeout(() => {
+        modal.classList.add('show');
+      }, 10);
       document.body.style.overflow = 'hidden'; // Prevent background scroll
     } else {
       modal.classList.remove('show');
@@ -29,7 +32,7 @@ export function Modal({
       setTimeout(() => {
         modal.style.display = 'none';
         document.body.style.overflow = 'unset';
-      }, 150);
+      }, 300);
     }
 
     // Cleanup on unmount
