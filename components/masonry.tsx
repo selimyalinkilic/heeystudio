@@ -213,25 +213,75 @@ export default function Masonry() {
                   style={{
                     objectFit: 'contain',
                   }}
-                  onClick={(e) => {
-                    const img = e.target as HTMLImageElement;
-                    const container = document.getElementById(
-                      'image-zoom-container'
-                    );
-
-                    if (img.classList.contains('zoomed')) {
-                      img.style.transform = 'scale(1)';
-                      img.classList.remove('zoomed');
-                      container?.classList.remove('zoomed');
-                    } else {
-                      img.style.transform = 'scale(1.5)';
+                  onMouseEnter={(e) => {
+                    // Desktop hover zoom
+                    if (window.innerWidth >= 768) {
+                      const img = e.target as HTMLImageElement;
+                      const container = document.getElementById(
+                        'image-zoom-container'
+                      );
+                      img.style.transform = 'scale(1.2)';
                       img.classList.add('zoomed');
                       container?.classList.add('zoomed');
                     }
                   }}
+                  onMouseLeave={(e) => {
+                    // Desktop hover zoom out
+                    if (window.innerWidth >= 768) {
+                      const img = e.target as HTMLImageElement;
+                      const container = document.getElementById(
+                        'image-zoom-container'
+                      );
+                      img.style.transform = 'scale(1)';
+                      img.classList.remove('zoomed');
+                      container?.classList.remove('zoomed');
+                    }
+                  }}
+                  onMouseMove={(e) => {
+                    // Desktop hover zoom - follow mouse position
+                    if (window.innerWidth >= 768) {
+                      const img = e.target as HTMLImageElement;
+                      const rect = img.getBoundingClientRect();
+                      const x = ((e.clientX - rect.left) / rect.width) * 100;
+                      const y = ((e.clientY - rect.top) / rect.height) * 100;
+                      img.style.transformOrigin = `${x}% ${y}%`;
+                    }
+                  }}
+                  onDoubleClick={(e) => {
+                    // Mobile double tap zoom
+                    if (window.innerWidth < 768) {
+                      const img = e.target as HTMLImageElement;
+                      const container = document.getElementById(
+                        'image-zoom-container'
+                      );
+                      const rect = img.getBoundingClientRect();
+                      const x = ((e.clientX - rect.left) / rect.width) * 100;
+                      const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+                      img.style.transformOrigin = `${x}% ${y}%`;
+
+                      if (img.classList.contains('zoomed')) {
+                        img.style.transform = 'scale(1)';
+                        img.classList.remove('zoomed');
+                        container?.classList.remove('zoomed');
+                      } else {
+                        img.style.transform = 'scale(2)';
+                        img.classList.add('zoomed');
+                        container?.classList.add('zoomed');
+                      }
+                    }
+                  }}
                 />
-                <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-sm text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg transition-opacity duration-200 hover:bg-black/85">
-                  🔍 Click to zoom
+                {/* Mobile zoom indicator - only show on touch devices */}
+                <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-sm text-white p-2 rounded-full shadow-lg transition-opacity duration-200 hover:bg-black/85 md:hidden">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
+                  </svg>
                 </div>
               </div>
             )}

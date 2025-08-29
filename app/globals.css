@@ -199,12 +199,23 @@ body {
 .zoom-image {
   transition: transform 0.3s ease;
   transform-origin: center center;
+  touch-action: manipulation;
 }
 
-.zoom-image:hover {
-  cursor: zoom-in;
+/* Desktop hover behavior */
+@media (min-width: 768px) {
+  .zoom-image:hover {
+    cursor: zoom-in;
+  }
+
+  .zoom-image.zoomed {
+    cursor: zoom-out;
+  }
 }
 
-.zoom-image.zoomed {
-  cursor: zoom-out;
+/* Mobile touch behavior */
+@media (max-width: 767px) {
+  .zoom-image {
+    cursor: pointer;
+  }
 }
