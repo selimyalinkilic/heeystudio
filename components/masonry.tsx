@@ -64,9 +64,20 @@ export default function Masonry() {
   }, []);
 
   const handlePortfolioClick = (portfolio: Portfolio) => {
-    setModalImageLoading(true);
+    // Video için loading false, image için true
+    setModalImageLoading(!portfolio.video_path);
     setSelectedPortfolio(portfolio);
     openModal();
+  };
+
+  const handleModalClose = () => {
+    // Modal kapanıncа video'yu durdur
+    const videos = document.querySelectorAll('video');
+    videos.forEach((video) => {
+      video.pause();
+      video.currentTime = 0;
+    });
+    closeModal();
   };
 
   if (loading) {
@@ -208,38 +219,50 @@ export default function Masonry() {
           </>
         )}
       </div>
-      <Modal isOpen={isOpen} onClose={closeModal}>
+      <Modal isOpen={isOpen} onClose={handleModalClose}>
         {selectedPortfolio && (
           <div className="w-full max-w-none">
             {/* Video varsa video göster, yoksa resim göster */}
             {selectedPortfolio.video_path ? (
-              <div className="relative">
-                {/* Video Loading */}
-                {modalImageLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white rounded-lg z-10">
-                    <ModalLoading />
-                  </div>
-                )}
-
+              <div className="video-container relative">
                 <video
                   src={
                     selectedPortfolio.video_path.startsWith('/')
                       ? selectedPortfolio.video_path
                       : videoUrls[selectedPortfolio.id] || ''
                   }
-                  controls
-                  className={`w-full max-w-4xl rounded-lg mx-auto block transition-opacity duration-300 ${
-                    modalImageLoading ? 'opacity-0' : 'opacity-100'
-                  }`}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  disablePictureInPicture
+                  className="w-full max-w-4xl rounded-lg mx-auto block"
                   poster={
                     selectedPortfolio.image_path_original.startsWith('/')
                       ? selectedPortfolio.image_path_original
                       : imageUrls[`${selectedPortfolio.id}_original`] ||
                         '/photo1.jpeg'
                   }
-                  onLoadedData={() => {
-                    setModalImageLoading(false);
+                  onLoadedMetadata={(e) => {
+                    // Video metadata yüklendiğinde manuel play dene
+                    const video = e.target as HTMLVideoElement;
+                    video.play().catch((error) => {
+                      console.log('Video autoplay failed:', error);
+                    });
                   }}
+                  onEnded={(e) => {
+                    // Video bitince baştan başla
+                    const video = e.target as HTMLVideoElement;
+                    video.currentTime = 0;
+                    video.play().catch((error) => {
+                      console.log('Video replay failed:', error);
+                    });
+                  }}
+                  onError={(e) => {
+                    console.error('Video loading error:', e);
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
                 />
               </div>
             ) : (

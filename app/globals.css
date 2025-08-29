@@ -200,6 +200,46 @@ body {
   max-height: 70vh;
 }
 
+/* Video container styles */
+.video-container {
+  border-radius: 0.5rem;
+  max-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+  position: relative;
+}
+
+.video-container video {
+  background-color: transparent !important;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Prevent ANY overlay or hover effects on video */
+.video-container:hover {
+  background-color: #f8f9fa !important;
+}
+
+.video-container video:hover {
+  background-color: transparent !important;
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+.video-container::before,
+.video-container::after {
+  display: none !important;
+}
+
+.video-container video::before,
+.video-container video::after {
+  display: none !important;
+}
+
 .zoom-image {
   transition: transform 0.3s ease;
   transform-origin: center center;
@@ -280,4 +320,35 @@ body {
 
 .image-loaded {
   opacity: 1;
+}
+
+/* Video player customizations */
+video::-webkit-media-controls-panel {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Hide playback speed controls */
+video::-webkit-media-controls-timeline-container,
+video::-webkit-media-controls-current-time-display,
+video::-webkit-media-controls-time-remaining-display {
+  display: block;
+}
+
+/* Disable context menu for videos */
+video {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Prevent any modal overlay effects when video is playing */
+.modal.show .modal-content:hover {
+  background-color: #fff;
+}
+
+.modal.show .modal-body:hover {
+  background-color: transparent;
 }
