@@ -1,11 +1,12 @@
 import { supabase, Portfolio } from '@/lib/supabase';
 
-// Hero kısmı için son eklenen 3 portfolyoyu getir
+// Hero kısmı için son eklenen 3 portfolyoyu getir (sadece görünür olanlar)
 export async function getLatestPortfolios(): Promise<Portfolio[]> {
   try {
     const { data, error } = await supabase
       .from('portfolios')
       .select('*')
+      .eq('visibility', true) // Sadece görünür olanlar
       .order('created_at', { ascending: false })
       .limit(3);
 
@@ -21,12 +22,13 @@ export async function getLatestPortfolios(): Promise<Portfolio[]> {
   }
 }
 
-// Masonry için tüm portfolyoları getir
+// Masonry için tüm portfolyoları getir (sadece görünür olanlar)
 export async function getAllPortfolios(): Promise<Portfolio[]> {
   try {
     const { data, error } = await supabase
       .from('portfolios')
       .select('*')
+      .eq('visibility', true) // Sadece görünür olanlar
       .order('created_at', { ascending: false });
 
     if (error) {

@@ -28,25 +28,61 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 - `id` (bigserial, primary key)
 - `title` (varchar, required) - Portfolio item title
 - `description` (text, optional) - Portfolio item description
-- `image_url` (varchar, required) - URL to portfolio image
-- `category` (varchar, optional) - Portfolio category
+- `image_path_original` (varchar, required) - File path of original high-resolution image in Storage
+- `image_path_min` (varchar, required) - File path of thumbnail/small image in Storage
+- `video_path` (varchar, optional) - File path of video file in Storage
+- `visibility` (boolean, default: true) - Whether item is public or private
 - `created_at` (timestamp, auto-generated)
 - `updated_at` (timestamp, auto-updated)
+
+## Supabase Storage Setup
+
+### Bucket Structure
+
+Your `heey-assets` bucket should have the following structure:
+
+```
+heey-assets/
+├── images/
+│   ├── portfolio_1_original.jpg
+│   ├── portfolio_1_thumb.jpg
+│   ├── portfolio_2_original.jpg
+│   ├── portfolio_2_thumb.jpg
+│   └── ...
+└── videos/
+    ├── portfolio_video_1.mp4
+    ├── portfolio_video_2.mp4
+    └── ...
+```
+
+### Storage Helper Functions
+
+The `lib/storage.ts` file provides helper functions for:
+
+- `getImageUrl(path)` - Converts storage path to public URL
+- `getVideoUrl(path)` - Converts video path to public URL
+- `uploadImage(file, filename)` - Uploads image to images/ folder
+- `uploadVideo(file, filename)` - Uploads video to videos/ folder
+- `deleteImage(path)` - Deletes image from storage
+- `deleteVideo(path)` - Deletes video from storage
 
 ## Features
 
 ### Hero Section
 
-- Displays the latest 3 portfolio items from Supabase
+- Displays the latest 3 portfolio items from Supabase (only visible ones)
+- Uses original high-resolution images (`image_url_original`)
 - Falls back to static images if no data is available
 - Shows portfolio title and description as overlay
 
 ### Masonry Gallery
 
-- Displays all portfolio items from Supabase
-- Falls back to static images if no data is available
-- Opens portfolio details in a modal when clicked
+- Displays all portfolio items from Supabase (only visible ones)
+- Uses thumbnail images (`image_url_min`) for better performance
+- Opens portfolio details in modal with original high-resolution image when clicked
+- Shows video if `video_url` is available, otherwise shows image
 - Shows portfolio info on hover
+- Falls back to static images if no data is available
 
 ## Getting Supabase Credentials
 

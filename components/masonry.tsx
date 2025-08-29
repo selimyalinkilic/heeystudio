@@ -4,6 +4,7 @@ import { useModal } from '@/hooks/useModal';
 import { useState, useEffect } from 'react';
 import { getAllPortfolios } from '@/lib/api';
 import { Portfolio } from '@/lib/supabase';
+import { getImageUrl, getVideoUrl } from '@/lib/storage';
 
 export default function Masonry() {
   const { isOpen, openModal, closeModal } = useModal();
@@ -62,7 +63,7 @@ export default function Masonry() {
               >
                 <Image
                   className="hover:scale-105 transition-transform duration-300"
-                  src={portfolio.image_url}
+                  src={getImageUrl(portfolio.image_path_min)} // Küçük resim kullan
                   alt={portfolio.title}
                   layout="responsive"
                   width={500}
@@ -94,8 +95,10 @@ export default function Masonry() {
                     id: 1,
                     title: 'Sample Portfolio 1',
                     description: 'Sample description',
-                    image_url: '/photo1.jpeg',
-                    category: 'Sample',
+                    image_path_original: '/photo1.jpeg', // Fallback için direkt URL
+                    image_path_min: '/photo1.jpeg', // Küçük (aynı olsun fallback için)
+                    video_path: undefined,
+                    visibility: true,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                   })
@@ -120,8 +123,10 @@ export default function Masonry() {
                     id: 2,
                     title: 'Sample Portfolio 2',
                     description: 'Sample description',
-                    image_url: '/photo2.jpeg',
-                    category: 'Sample',
+                    image_path_original: '/photo2.jpeg', // Fallback için direkt URL
+                    image_path_min: '/photo2.jpeg', // Küçük (aynı olsun fallback için)
+                    video_path: undefined,
+                    visibility: true,
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString(),
                   })
@@ -147,14 +152,36 @@ export default function Masonry() {
       >
         {selectedPortfolio && (
           <div className="space-y-4">
-            <Image
-              src={selectedPortfolio.image_url}
-              alt={selectedPortfolio.title}
-              layout="responsive"
-              width={500}
-              height={300}
-              className="rounded-lg"
-            />
+            {/* Video varsa video göster, yoksa resim göster */}
+            {selectedPortfolio.video_path ? (
+              <video
+                src={
+                  selectedPortfolio.video_path.startsWith('/')
+                    ? selectedPortfolio.video_path
+                    : getVideoUrl(selectedPortfolio.video_path)
+                }
+                controls
+                className="w-full rounded-lg"
+                poster={
+                  selectedPortfolio.image_path_original.startsWith('/')
+                    ? selectedPortfolio.image_path_original
+                    : getImageUrl(selectedPortfolio.image_path_original)
+                }
+              />
+            ) : (
+              <Image
+                src={
+                  selectedPortfolio.image_path_original.startsWith('/')
+                    ? selectedPortfolio.image_path_original
+                    : getImageUrl(selectedPortfolio.image_path_original)
+                }
+                alt={selectedPortfolio.title}
+                layout="responsive"
+                width={500}
+                height={300}
+                className="rounded-lg"
+              />
+            )}
             <div>
               <h3 className="text-xl font-semibold mb-2">
                 {selectedPortfolio.title}
@@ -163,11 +190,6 @@ export default function Masonry() {
                 <p className="text-gray-600 mb-3">
                   {selectedPortfolio.description}
                 </p>
-              )}
-              {selectedPortfolio.category && (
-                <span className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full">
-                  {selectedPortfolio.category}
-                </span>
               )}
               <p className="text-sm text-gray-500 mt-3">
                 Created:{' '}

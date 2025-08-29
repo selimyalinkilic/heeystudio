@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { getLatestPortfolios } from '@/lib/api';
 import { Portfolio } from '@/lib/supabase';
+import { getImageUrl } from '@/lib/storage';
 
 export default function Hero() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
@@ -45,8 +46,10 @@ export default function Hero() {
           id: index,
           title: `Slide ${index + 1}`,
           description: undefined,
-          image_url: img,
-          category: undefined,
+          image_path_original: img, // Fallback için direkt URL kullan
+          image_path_min: img, // Min aynı olsun fallback için
+          video_path: undefined,
+          visibility: true,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         }));
@@ -67,7 +70,11 @@ export default function Hero() {
             className='relative after:content-[""] after:w-full after:h-full after:absolute after:top-0 after:left-0 after:bg-black/30 after:z-10'
           >
             <Image
-              src={item.image_url || '/photo1.jpeg'}
+              src={
+                item.image_path_original.startsWith('/')
+                  ? item.image_path_original
+                  : getImageUrl(item.image_path_original)
+              }
               alt={item.title || `Slide ${index + 1}`}
               className="object-cover w-full h-full"
               fill

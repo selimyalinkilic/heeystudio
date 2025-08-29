@@ -15,8 +15,10 @@ export interface Portfolio {
   id: number;
   title: string;
   description?: string;
-  image_url: string;
-  category?: string;
+  image_path_original: string; // Orijinal büyük resim dosya path'i (images/ klasöründe)
+  image_path_min: string; // Küçük thumbnail resim dosya path'i (images/ klasöründe)
+  video_path?: string; // Video dosya path'i (videos/ klasöründe, opsiyonel)
+  visibility: boolean; // Görünürlük (public/private)
   created_at: string;
   updated_at: string;
 }
