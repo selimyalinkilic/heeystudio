@@ -173,11 +173,7 @@ export default function Masonry() {
           </>
         )}
       </div>
-      <Modal
-        title={selectedPortfolio?.title || 'Portfolio'}
-        isOpen={isOpen}
-        onClose={closeModal}
-      >
+      <Modal isOpen={isOpen} onClose={closeModal}>
         {selectedPortfolio && (
           <div className="w-full max-w-none">
             {/* Video varsa video göster, yoksa resim göster */}
@@ -234,24 +230,20 @@ export default function Masonry() {
                     }
                   }}
                 />
-                <div className="absolute top-2 right-2 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium">
-                  Click to zoom
+                <div className="absolute top-3 right-3 bg-black/75 backdrop-blur-sm text-white px-3 py-2 rounded-full text-sm font-medium shadow-lg transition-opacity duration-200 hover:bg-black/85">
+                  🔍 Click to zoom
                 </div>
               </div>
             )}
-            <div className="mt-4 text-center">
-              <h3 className="text-xl font-semibold mb-2">
+            <div className="mt-6 px-2">
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
                 {selectedPortfolio.title}
               </h3>
               {selectedPortfolio.description && (
-                <p className="text-gray-600 mb-3 max-w-2xl mx-auto">
+                <p className="text-gray-600 leading-relaxed text-center max-w-3xl mx-auto text-lg">
                   {selectedPortfolio.description}
                 </p>
               )}
-              <p className="text-sm text-gray-500">
-                Created:{' '}
-                {new Date(selectedPortfolio.created_at).toLocaleDateString()}
-              </p>
             </div>
           </div>
         )}

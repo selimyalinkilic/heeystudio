@@ -2,12 +2,10 @@
 import React, { useEffect } from 'react';
 
 export function Modal({
-  title,
   children,
   isOpen,
   onClose,
 }: {
-  title: string;
   children: React.ReactNode;
   isOpen: boolean;
   onClose: () => void;
@@ -136,30 +134,18 @@ export function Modal({
     >
       <div className={`modal-dialog ${modalSize}`} role="document">
         <div className="modal-content">
-          <div className="modal-header">
-            <h2 id="modalTitle" className="modal-title">
-              {title}
-            </h2>
+          <div className="modal-header border-0 pb-0">
             <button
               type="button"
-              className="close-button"
+              className="close-button ml-auto"
               onClick={handleClose}
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div className="modal-body overflow-hidden max-h-[80vh]">
+          <div className="modal-body overflow-hidden max-h-[85vh] p-4">
             {children}
-          </div>
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleClose}
-            >
-              Close
-            </button>
           </div>
         </div>
       </div>
