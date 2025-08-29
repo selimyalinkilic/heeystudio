@@ -30,8 +30,10 @@ export function Modal({
     if (!modal) return;
 
     if (isOpen) {
-      modal.style.display = 'block';
-      // Trigger reflow to ensure display:block is applied before adding show class
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      // Trigger reflow to ensure display:flex is applied before adding show class
       void modal.offsetHeight;
       setTimeout(() => {
         modal.classList.add('show');
@@ -42,7 +44,18 @@ export function Modal({
       // Wait for animation to complete before hiding
       setTimeout(() => {
         modal.style.display = 'none';
+        modal.style.alignItems = '';
+        modal.style.justifyContent = '';
         document.body.style.overflow = 'unset';
+
+        // Reset modal-dialog dimensions when fully closed
+        const modalDialog = modal.querySelector('.modal-dialog') as HTMLElement;
+        if (modalDialog) {
+          modalDialog.style.width = '';
+          modalDialog.style.height = '';
+          modalDialog.style.minWidth = '';
+          modalDialog.style.maxWidth = '';
+        }
       }, 300);
     }
 
@@ -52,19 +65,57 @@ export function Modal({
     };
   }, [isOpen]);
 
+  const handleClose = React.useCallback(() => {
+    const modal = modalRef.current;
+    if (!modal) {
+      onClose();
+      return;
+    }
+
+    // Freeze modal-dialog dimensions before zoom reset
+    const modalDialog = modal.querySelector('.modal-dialog') as HTMLElement;
+    if (modalDialog) {
+      const currentWidth = modalDialog.offsetWidth;
+      const currentHeight = modalDialog.offsetHeight;
+      modalDialog.style.width = `${currentWidth}px`;
+      modalDialog.style.height = `${currentHeight}px`;
+      modalDialog.style.minWidth = 'auto';
+      modalDialog.style.maxWidth = 'none';
+    }
+
+    // Reset any zoom state INSTANTLY
+    const zoomedImages = modal.querySelectorAll('.zoom-image.zoomed');
+    zoomedImages.forEach((img) => {
+      const imgElement = img as HTMLImageElement;
+      imgElement.style.transition = 'none';
+      imgElement.style.transform = 'scale(1)';
+      imgElement.classList.remove('zoomed');
+      void imgElement.offsetHeight;
+      imgElement.style.transition = '';
+    });
+    const zoomedContainers = modal.querySelectorAll('.zoom-container.zoomed');
+    zoomedContainers.forEach((container) => {
+      const containerElement = container as HTMLElement;
+      containerElement.classList.remove('zoomed');
+    });
+
+    // Close modal after zoom reset
+    onClose();
+  }, [onClose]);
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
   const handleEscapeKey = React.useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        handleClose();
       }
     },
-    [isOpen, onClose]
+    [isOpen, handleClose]
   );
 
   useEffect(() => {
@@ -92,7 +143,7 @@ export function Modal({
             <button
               type="button"
               className="close-button"
-              onClick={onClose}
+              onClick={handleClose}
               aria-label="Close"
             >
               <span aria-hidden="true">&times;</span>
@@ -105,7 +156,7 @@ export function Modal({
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={onClose}
+              onClick={handleClose}
             >
               Close
             </button>

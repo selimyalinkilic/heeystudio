@@ -179,7 +179,7 @@ export default function Masonry() {
         onClose={closeModal}
       >
         {selectedPortfolio && (
-          <div className="space-y-4">
+          <div className="w-full max-w-none">
             {/* Video varsa video göster, yoksa resim göster */}
             {selectedPortfolio.video_path ? (
               <video
@@ -189,7 +189,7 @@ export default function Masonry() {
                     : videoUrls[selectedPortfolio.id] || ''
                 }
                 controls
-                className="w-full rounded-lg"
+                className="w-full max-w-4xl rounded-lg mx-auto block"
                 poster={
                   selectedPortfolio.image_path_original.startsWith('/')
                     ? selectedPortfolio.image_path_original
@@ -198,56 +198,57 @@ export default function Masonry() {
                 }
               />
             ) : (
-              <div className="zoom-container" id="image-zoom-container">
-                <div className="flex justify-center">
-                  <Image
-                    src={
-                      selectedPortfolio.image_path_original.startsWith('/')
-                        ? selectedPortfolio.image_path_original
-                        : imageUrls[`${selectedPortfolio.id}_original`] ||
-                          '/photo1.jpeg'
-                    }
-                    alt={selectedPortfolio.title}
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    className="zoom-image rounded-lg max-w-full max-h-[60vh] w-auto h-auto"
-                    style={{
-                      objectFit: 'contain',
-                    }}
-                    onClick={(e) => {
-                      const img = e.target as HTMLImageElement;
-                      const container = document.getElementById(
-                        'image-zoom-container'
-                      );
+              <div
+                className="zoom-container relative"
+                id="image-zoom-container"
+              >
+                <Image
+                  src={
+                    selectedPortfolio.image_path_original.startsWith('/')
+                      ? selectedPortfolio.image_path_original
+                      : imageUrls[`${selectedPortfolio.id}_original`] ||
+                        '/photo1.jpeg'
+                  }
+                  alt={selectedPortfolio.title}
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="zoom-image rounded-lg max-w-full max-h-[60vh] w-auto h-auto"
+                  style={{
+                    objectFit: 'contain',
+                  }}
+                  onClick={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    const container = document.getElementById(
+                      'image-zoom-container'
+                    );
 
-                      if (img.classList.contains('zoomed')) {
-                        img.style.transform = 'scale(1)';
-                        img.classList.remove('zoomed');
-                        container?.classList.remove('zoomed');
-                      } else {
-                        img.style.transform = 'scale(2)';
-                        img.classList.add('zoomed');
-                        container?.classList.add('zoomed');
-                      }
-                    }}
-                  />
-                </div>
+                    if (img.classList.contains('zoomed')) {
+                      img.style.transform = 'scale(1)';
+                      img.classList.remove('zoomed');
+                      container?.classList.remove('zoomed');
+                    } else {
+                      img.style.transform = 'scale(1.5)';
+                      img.classList.add('zoomed');
+                      container?.classList.add('zoomed');
+                    }
+                  }}
+                />
                 <div className="absolute top-2 right-2 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-medium">
                   Click to zoom
                 </div>
               </div>
             )}
-            <div>
+            <div className="mt-4 text-center">
               <h3 className="text-xl font-semibold mb-2">
                 {selectedPortfolio.title}
               </h3>
               {selectedPortfolio.description && (
-                <p className="text-gray-600 mb-3">
+                <p className="text-gray-600 mb-3 max-w-2xl mx-auto">
                   {selectedPortfolio.description}
                 </p>
               )}
-              <p className="text-sm text-gray-500 mt-3">
+              <p className="text-sm text-gray-500">
                 Created:{' '}
                 {new Date(selectedPortfolio.created_at).toLocaleDateString()}
               </p>

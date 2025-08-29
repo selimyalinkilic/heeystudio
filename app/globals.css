@@ -41,6 +41,7 @@ body {
   background-color: rgba(0, 0, 0, 0.5);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
+  display: none;
 }
 
 .modal.show {
@@ -50,21 +51,20 @@ body {
 .modal-dialog {
   position: relative;
   width: auto;
-  margin: 0.5rem;
+  margin: 1rem;
   pointer-events: none;
   transform: translate(0, -50px);
   transition: transform 0.4s ease-out;
+  max-width: 85vw;
+  min-width: 320px;
 }
 
 .modal-dialog.modal-lg {
-  max-width: 90vw;
-  width: 90vw;
+  max-width: 80vw;
 }
 
 .modal-dialog.modal-xl {
-  max-width: 95vw;
-  width: 95vw;
-  margin: 0.25rem auto;
+  max-width: 85vw;
 }
 
 .modal.show .modal-dialog {
@@ -76,6 +76,7 @@ body {
   display: flex;
   flex-direction: column;
   width: 100%;
+  max-width: 100%;
   pointer-events: auto;
   background-color: #fff;
   background-clip: padding-box;
@@ -83,6 +84,7 @@ body {
   border-radius: 0.3rem;
   box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.5);
   outline: 0;
+  overflow: hidden;
 }
 
 .modal-header {
@@ -121,7 +123,13 @@ body {
 .modal-body {
   position: relative;
   flex: 1 1 auto;
-  padding: 1rem;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  max-height: 80vh;
 }
 
 .modal-footer {
@@ -137,10 +145,23 @@ body {
 /* Responsive */
 @media (min-width: 992px) {
   .modal-dialog {
-    height: 100vh;
-    max-width: 1256px;
-    max-height: 706px;
-    margin: 1.75rem auto;
+    max-width: 1200px;
+  }
+
+  .modal-dialog.modal-lg {
+    max-width: 80vw;
+  }
+
+  .modal-dialog.modal-xl {
+    max-width: 85vw;
+  }
+}
+
+@media (max-width: 991px) {
+  .modal-dialog.modal-lg,
+  .modal-dialog.modal-xl {
+    max-width: 95vw;
+    margin: 0.5rem;
   }
 }
 
@@ -157,11 +178,15 @@ body {
 .zoom-container {
   overflow: hidden;
   border-radius: 0.5rem;
+  max-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .zoom-container.zoomed {
-  overflow: auto;
-  max-height: 80vh;
+  overflow: hidden;
+  max-height: 70vh;
 }
 
 .zoom-image {
