@@ -10,12 +10,24 @@ import { getImageUrl } from '@/lib/storage';
 export default function Hero() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     async function fetchPortfolios() {
       try {
         const data = await getLatestPortfolios();
         setPortfolios(data);
+
+        // Her portfolio için image URL'lerini oluştur
+        const urls: { [key: string]: string } = {};
+        for (const portfolio of data) {
+          if (!portfolio.image_path_original.startsWith('/')) {
+            urls[portfolio.image_path_original] = await getImageUrl(
+              portfolio.image_path_original
+            );
+          }
+        }
+        setImageUrls(urls);
       } catch (error) {
         console.error('Error fetching portfolios:', error);
       } finally {
@@ -73,7 +85,7 @@ export default function Hero() {
               src={
                 item.image_path_original.startsWith('/')
                   ? item.image_path_original
-                  : getImageUrl(item.image_path_original)
+                  : imageUrls[item.image_path_original] || '/photo1.jpeg'
               }
               alt={item.title || `Slide ${index + 1}`}
               className="object-cover w-full h-full"

@@ -4,7 +4,7 @@ const BUCKET_NAME = 'heey-assets';
 
 // Supabase Storage URL'lerini oluşturan helper fonksiyonlar
 
-export function getImageUrl(imagePath: string): string {
+export async function getImageUrl(imagePath: string): Promise<string> {
   if (!imagePath) return '';
 
   // Eğer URL zaten tam URL ise (http/https ile başlıyorsa) olduğu gibi döndür
@@ -12,15 +12,20 @@ export function getImageUrl(imagePath: string): string {
     return imagePath;
   }
 
-  // Supabase storage URL'ini oluştur
-  const { data } = supabase.storage
+  // Private bucket için signed URL oluştur (1 saat geçerli)
+  const { data, error } = await supabase.storage
     .from(BUCKET_NAME)
-    .getPublicUrl(`images/${imagePath}`);
+    .createSignedUrl(`images/${imagePath}`, 3600);
 
-  return data.publicUrl;
+  if (error) {
+    console.error('Error creating signed URL for image:', error);
+    return '';
+  }
+
+  return data.signedUrl;
 }
 
-export function getVideoUrl(videoPath: string): string {
+export async function getVideoUrl(videoPath: string): Promise<string> {
   if (!videoPath) return '';
 
   // Eğer URL zaten tam URL ise (http/https ile başlıyorsa) olduğu gibi döndür
@@ -28,15 +33,18 @@ export function getVideoUrl(videoPath: string): string {
     return videoPath;
   }
 
-  // Supabase storage URL'ini oluştur
-  const { data } = supabase.storage
+  // Private bucket için signed URL oluştur (1 saat geçerli)
+  const { data, error } = await supabase.storage
     .from(BUCKET_NAME)
-    .getPublicUrl(`videos/${videoPath}`);
+    .createSignedUrl(`videos/${videoPath}`, 3600);
 
-  return data.publicUrl;
-}
+  if (error) {
+    console.error('Error creating signed URL for video:', error);
+    return '';
+  }
 
-// Dosya upload fonksiyonları
+  return data.signedUrl;
+} // Dosya upload fonksiyonları
 
 export async function uploadImage(
   file: File,

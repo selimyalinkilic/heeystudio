@@ -13,12 +13,40 @@ export default function Masonry() {
   );
   const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [loading, setLoading] = useState(true);
+  const [imageUrls, setImageUrls] = useState<{ [key: string]: string }>({});
+  const [videoUrls, setVideoUrls] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     async function fetchPortfolios() {
       try {
         const data = await getAllPortfolios();
         setPortfolios(data);
+
+        // Her portfolio için image ve video URL'lerini oluştur
+        const imgUrls: { [key: string]: string } = {};
+        const vidUrls: { [key: string]: string } = {};
+
+        for (const portfolio of data) {
+          // Thumbnail image URL
+          if (!portfolio.image_path_min.startsWith('/')) {
+            imgUrls[`${portfolio.id}_min`] = await getImageUrl(
+              portfolio.image_path_min
+            );
+          }
+          // Original image URL
+          if (!portfolio.image_path_original.startsWith('/')) {
+            imgUrls[`${portfolio.id}_original`] = await getImageUrl(
+              portfolio.image_path_original
+            );
+          }
+          // Video URL
+          if (portfolio.video_path && !portfolio.video_path.startsWith('/')) {
+            vidUrls[portfolio.id] = await getVideoUrl(portfolio.video_path);
+          }
+        }
+
+        setImageUrls(imgUrls);
+        setVideoUrls(vidUrls);
       } catch (error) {
         console.error('Error fetching portfolios:', error);
       } finally {
