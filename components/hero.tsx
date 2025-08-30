@@ -40,10 +40,9 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <div className="w-full aspect-square lg:h-screen flex items-center justify-center bg-gray-200">
+      <div className="w-full aspect-square lg:h-screen flex items-center justify-center bg-black">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -67,7 +66,7 @@ export default function Hero() {
         }));
 
   return (
-    <div className="w-full aspect-square lg:h-screen overflow-hidden relative after:content-[''] after:w-full after:h-12 after:lg:h-24 after:absolute after:bottom-0 after:left-0 after:from-black/0 after:to-black after:bg-gradient-to-b after:z-10">
+    <div className="w-full aspect-square bg-black lg:h-screen overflow-hidden relative after:content-[''] after:w-full after:h-12 after:lg:h-24 after:absolute after:bottom-0 after:left-0 after:from-black/0 after:to-black after:bg-gradient-to-b after:z-10">
       <Swiper
         spaceBetween={0}
         slidesPerView={1}
