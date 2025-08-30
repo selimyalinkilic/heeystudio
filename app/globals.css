@@ -19,6 +19,21 @@ html {
 
 body {
   font-family: var(--font-baloo-paaji-2);
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Layout stability */
+section {
+  position: relative;
+  width: 100%;
+}
+
+section#home {
+  min-height: 100vh; /* Ensure hero section always takes full height */
+}
+
+section#portfolio {
+  min-height: 100vh; /* Ensure portfolio section has minimum height */
 }
 
 .container {

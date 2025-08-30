@@ -40,10 +40,13 @@ export default function Hero() {
 
   if (loading) {
     return (
-      <div className="w-full aspect-square lg:h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      <div className="w-full aspect-square bg-black lg:h-screen overflow-hidden relative flex items-center justify-center">
+        <div className="text-center z-20">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white/30 mx-auto"></div>
+          <p className="text-white/70 mt-4 text-lg">Loading...</p>
         </div>
+        {/* Gradient overlay - aynı gerçek hero'daki gibi */}
+        <div className="absolute w-full h-12 lg:h-24 bottom-0 left-0 from-black/0 to-black bg-gradient-to-b z-10"></div>
       </div>
     );
   }

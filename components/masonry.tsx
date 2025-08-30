@@ -159,7 +159,7 @@ export default function Masonry() {
             Portfolio
           </h2>
         </div>
-        <div className="masonry-grid py-14 lg:py-20 px-4 lg:px-8">
+        <div className="masonry-grid py-14 lg:py-20 px-4 lg:px-8 min-h-screen">
           {/* Skeleton items - desktop 3'lü, mobile tekli */}
           {Array.from({ length: 9 }).map((_, index) => {
             // Sabit yükseklikler kullanarak hydration error'ını önle
