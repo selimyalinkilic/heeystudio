@@ -1,9 +1,8 @@
 import Image from 'next/image';
 import { Modal } from './modal';
-import Loading from './loading';
 import ModalLoading from './modal-loading';
 import { useModal } from '@/hooks/useModal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getAllPortfolios } from '@/lib/api';
 import { Portfolio } from '@/lib/supabase';
 import { getImageUrl, getVideoUrl } from '@/lib/storage';
@@ -21,6 +20,53 @@ export default function Masonry() {
     {}
   );
   const [modalImageLoading, setModalImageLoading] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  // Masonry layout function
+  const resizeMasonryItem = (item: HTMLElement) => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const rowGap = parseInt(
+      window.getComputedStyle(grid).getPropertyValue('grid-row-gap')
+    );
+    const rowHeight = parseInt(
+      window.getComputedStyle(grid).getPropertyValue('grid-auto-rows')
+    );
+
+    // Next.js Image component selector (img tag inside the component)
+    const imgElement = item.querySelector('img');
+    if (!imgElement) return;
+
+    const imgHeight = imgElement.getBoundingClientRect().height;
+    if (imgHeight === 0) return; // Image not loaded yet
+
+    const rowSpan = Math.ceil((imgHeight + rowGap) / (rowHeight + rowGap));
+    item.style.gridRowEnd = `span ${rowSpan}`;
+  };
+
+  const resizeAllMasonryItems = useCallback(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+
+    const allItems = grid.querySelectorAll(
+      '.masonry-item'
+    ) as NodeListOf<HTMLElement>;
+    allItems.forEach(resizeMasonryItem);
+  }, []);
+
+  // Image load handler
+  const handleImageLoad = (portfolioId: string) => {
+    setImageLoaded((prev) => ({
+      ...prev,
+      [`${portfolioId}_min`]: true,
+    }));
+
+    // Resizing after image load
+    setTimeout(() => {
+      resizeAllMasonryItems();
+    }, 50);
+  };
 
   useEffect(() => {
     async function fetchPortfolios() {
@@ -35,19 +81,30 @@ export default function Masonry() {
         for (const portfolio of data) {
           // Thumbnail image URL
           if (!portfolio.image_path_min.startsWith('/')) {
-            imgUrls[`${portfolio.id}_min`] = getImageUrl(
-              portfolio.image_path_min
+            const imageUrl = getImageUrl(portfolio.image_path_min);
+            imgUrls[`${portfolio.id}_min`] = imageUrl;
+            console.log(
+              `Generated thumbnail URL for portfolio ${portfolio.id}:`,
+              imageUrl
             );
           }
           // Original image URL
           if (!portfolio.image_path_original.startsWith('/')) {
-            imgUrls[`${portfolio.id}_original`] = getImageUrl(
-              portfolio.image_path_original
+            const originalUrl = getImageUrl(portfolio.image_path_original);
+            imgUrls[`${portfolio.id}_original`] = originalUrl;
+            console.log(
+              `Generated original URL for portfolio ${portfolio.id}:`,
+              originalUrl
             );
           }
           // Video URL
           if (portfolio.video_path && !portfolio.video_path.startsWith('/')) {
-            vidUrls[portfolio.id] = getVideoUrl(portfolio.video_path);
+            const videoUrl = getVideoUrl(portfolio.video_path);
+            vidUrls[portfolio.id] = videoUrl;
+            console.log(
+              `Generated video URL for portfolio ${portfolio.id}:`,
+              videoUrl
+            );
           }
         }
 
@@ -57,11 +114,25 @@ export default function Masonry() {
         console.error('Error fetching portfolios:', error);
       } finally {
         setLoading(false);
+        // Masonry layout'ı başlat
+        setTimeout(() => {
+          resizeAllMasonryItems();
+        }, 100);
       }
     }
 
     fetchPortfolios();
-  }, []);
+  }, [resizeAllMasonryItems]);
+
+  // Window resize handler for masonry
+  useEffect(() => {
+    const handleResize = () => {
+      resizeAllMasonryItems();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [resizeAllMasonryItems]);
 
   const handlePortfolioClick = (portfolio: Portfolio) => {
     // Video için loading false, image için true
@@ -81,7 +152,35 @@ export default function Masonry() {
   };
 
   if (loading) {
-    return <Loading />;
+    return (
+      <>
+        <div className="flex justify-center pt-14 lg:pt-20">
+          <h2 className="text-3xl lg:text-5xl text-center font-bold text-white">
+            Portfolio
+          </h2>
+        </div>
+        <div className="masonry-grid py-14 lg:py-20 px-4 lg:px-8">
+          {/* Skeleton items - desktop 3'lü, mobile tekli */}
+          {Array.from({ length: 9 }).map((_, index) => {
+            // Sabit yükseklikler kullanarak hydration error'ını önle
+            const heights = [250, 320, 280, 300, 240, 350, 270, 310, 290];
+            return (
+              <div
+                key={`skeleton-${index}`}
+                className="masonry-item overflow-hidden rounded-lg relative group cursor-pointer shadow-lg"
+              >
+                <div
+                  className="w-full image-skeleton rounded-lg"
+                  style={{
+                    height: `${heights[index]}px`, // Sabit yükseklikler
+                  }}
+                ></div>
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
   }
 
   return (
@@ -91,35 +190,48 @@ export default function Masonry() {
           Portfolio
         </h2>
       </div>
-      <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 py-14 lg:py-20 px-4 lg:px-8">
+      <div className="masonry-grid py-14 lg:py-20 px-4 lg:px-8" ref={gridRef}>
         {portfolios.length > 0 ? (
           portfolios.map((portfolio) => (
             <div
               key={portfolio.id}
-              className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
+              className="masonry-item overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300"
             >
               <a
                 type="button"
-                className="hover:cursor-pointer block"
+                className="hover:cursor-pointer flex min-h-full"
                 onClick={() => handlePortfolioClick(portfolio)}
               >
-                {/* Image skeleton */}
-                {!imageLoaded[`${portfolio.id}_min`] && (
-                  <div className="w-full h-64 image-skeleton rounded-lg"></div>
-                )}
-
+                {/* Safari uyumluluğu için Next.js Image */}
                 <Image
-                  className={`hover:scale-105 transition-transform duration-300 w-full h-auto ${
+                  className={`transition-all duration-300 w-full h-auto rounded-lg ${
                     imageLoaded[`${portfolio.id}_min`]
                       ? 'image-loaded'
                       : 'image-loading'
                   }`}
-                  src={imageUrls[`${portfolio.id}_min`] || '/photo1.jpeg'} // Cached URL kullan
+                  src={imageUrls[`${portfolio.id}_min`] || '/photo1.jpeg'}
                   alt={portfolio.title}
                   width={500}
                   height={300}
                   style={{ objectFit: 'cover' }}
+                  unoptimized={true}
+                  priority={false}
                   onLoad={() => {
+                    console.log(
+                      `Image loaded successfully for portfolio ${portfolio.id}`
+                    );
+                    handleImageLoad(portfolio.id.toString());
+                  }}
+                  onError={(e) => {
+                    console.error(
+                      `Failed to load image for portfolio ${portfolio.id}`,
+                      e
+                    );
+                    console.error(
+                      `Image URL was:`,
+                      imageUrls[`${portfolio.id}_min`]
+                    );
+                    // Fallback image yükle
                     setImageLoaded((prev) => ({
                       ...prev,
                       [`${portfolio.id}_min`]: true,
@@ -142,14 +254,12 @@ export default function Masonry() {
                 )}
 
                 {/* Portfolio info overlay */}
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <h3 className="text-white font-semibold text-lg mb-1">
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <h3 className="text-white font-semibold mb-1">
                     {portfolio.title}
                   </h3>
                   {portfolio.description && (
-                    <p className="text-white/80 text-sm line-clamp-2">
-                      {portfolio.description}
-                    </p>
+                    <p className="text-white/80">{portfolio.description}</p>
                   )}
                 </div>
               </a>
@@ -158,7 +268,7 @@ export default function Masonry() {
         ) : (
           // Fallback images if no portfolios
           <>
-            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="masonry-item overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
               <a
                 type="button"
                 className="hover:cursor-pointer"
@@ -178,16 +288,17 @@ export default function Masonry() {
                 }
               >
                 <Image
-                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
+                  className="transition-all duration-300 w-full h-auto rounded-lg"
                   src="/photo1.jpeg"
                   alt="Sample Portfolio"
                   width={500}
                   height={300}
                   style={{ objectFit: 'cover' }}
+                  unoptimized={true}
                 />
               </a>
             </div>
-            <div className="mb-4 break-inside-avoid overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <div className="masonry-item overflow-hidden rounded-lg relative group cursor-pointer shadow-lg hover:shadow-xl transition-shadow duration-300">
               <a
                 type="button"
                 className="hover:cursor-pointer"
@@ -207,12 +318,13 @@ export default function Masonry() {
                 }
               >
                 <Image
-                  className="hover:scale-105 transition-transform duration-300 w-full h-auto"
+                  className="transition-all duration-300 w-full h-auto rounded-lg"
                   src="/photo2.jpeg"
                   alt="Sample Portfolio"
                   width={500}
                   height={300}
                   style={{ objectFit: 'cover' }}
+                  unoptimized={true}
                 />
               </a>
             </div>

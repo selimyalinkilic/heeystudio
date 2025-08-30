@@ -10,13 +10,18 @@ export default function Footer() {
           </div>
           <div className="flex justify-center space-x-20">
             <p className="text-black">
-              <a href="mailto:contact@example.com" className="underline">
-                contact@example.com
+              <a href="mailto:studioheey@gmail.com" className="underline">
+                E-Mail
               </a>
             </p>
             <ul>
               <li>
-                <a href="https://www.instagram.com" className="underline">
+                <a
+                  href="https://www.instagram.com/studioheey/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
                   Instagram
                 </a>
               </li>
