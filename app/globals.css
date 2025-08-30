@@ -29,7 +29,9 @@ section {
 }
 
 section#home {
-  min-height: 100vh; /* Ensure hero section always takes full height */
+  @media (min-width: 1024px) {
+    min-height: 100vh; /* Ensure home section has minimum height on larger screens */
+  }
 }
 
 section#portfolio {
